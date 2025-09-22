@@ -365,7 +365,7 @@ void process_KCC_file( std::string kcc_filename)
     std::println( "Header-Informationen");
     std::println( "Name:           {}", header.name);
     std::println( "Anzahl Adr.:    {}", header.addrargs);
-    if(( header.addrargs < 2) || ( header.addrargs > 3))
+    if(( header.addrargs < 2) || ( header.addrargs > 0x0A))
     {
         std::println( "FEHLER: Anzahl der Adressargumente ({}) ungültig.", header.addrargs);
         std::println( "Keine gültige KCC-Datei!");

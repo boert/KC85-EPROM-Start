@@ -1,4 +1,3 @@
-
 # Prüfprogramm für KCC/KCB-Dateien
 
 Dieses Projekt enthält ein Prüfprogramm für KCC- bzw. KCB-Dateien.  
@@ -10,7 +9,7 @@ Folgende Prüfungen werden durchgeführt:
 - ob die Dateilänge ein Vielfaches von 128 ist
 - ob Datei evtl. eine BASIC-Datei ist (z.B. Kennung SSS)
 - ob Datei evtl. eine TAP-Datei mit BASIC-Inhalt ist
-- ob der Header eine gültige Anzahl an Adressargumenten hat (2 oder 3)
+- ob der Header eine gültige Anzahl an Adressargumenten hat (zwischen 2 und 10)
 - ob die Dateigröße zur Größe aus dem Header passt
 
 Die Ausgabe enthält:
