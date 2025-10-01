@@ -288,4 +288,5 @@ KCT4:   LD      (VERSION),A     ; fuer weitere Abfragen hier ablegen
 BASIC:  DB      'BASIC',0       ; Vergleichskette fuer Suche CAOS 3.4
 
 
-PENDE:   ; 
+PENDE:
+        align 128
