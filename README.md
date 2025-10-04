@@ -19,12 +19,16 @@ Es werden unterschiedliche Modultypen und verschiedene Startmethoden unterstütz
 | M062  32k/64k seg. RAM/ROM    | F3                 |  8 kByte          | 4/8      | ja      | nein     | ja      | nein
 | M125  USER PROM 8K/16K/64K    |                    |  8 kByte          | 1-4      | ja      | nein     | ja      | nein
 
+## Für Module mit 8k-Segmenten
 
-## `JUMP_Start_8k`
+### `JUMP_Start_8k`
 für ROM/EPROM-Module mit 8 kByte-Segmenten, Start mittels JUMP
 
-## `MENU_Start_8k`
+### `MENU_Start_8k`
 für ROM/EPROM-Module mit 8 kByte-Segmenten, Start mittels MENU
+
+
+## Für Module mit 16k-Segmenten
 
 ## `JUMP_Start_16k`
 für ROM/EPROM-Module mit 16 kByte-Segmenten, Start mittels JUMP
