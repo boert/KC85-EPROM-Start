@@ -39,3 +39,7 @@
 
 # debug information files
 *.dwo
+
+# my files
+*.lst
+*.zip
