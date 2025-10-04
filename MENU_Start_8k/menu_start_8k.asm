@@ -27,7 +27,17 @@ bl1_start:
 bl1_size:
     dw 00000h   ; Länge, Block 1
 
-    dw 07f7fh
+    ; Menüpunkte restaurieren
+    ; Anzahl
+menu_cnt:
+    db 0
+    ; bis zu drei Adressen
+menu_addr:
+    dw 0
+    dw 0
+    dw 0
+
+    dw 07F7Fh
     db 'S'
     db 1
 
@@ -38,12 +48,29 @@ bl1_size:
     ld bc, (bl1_size)
     ld a, b
     or c
-    jr z, skip
+    jr z, skipcopy
     ld de, (prg_dest)
     ld hl, (bl1_start)
     ldir
-skip:
+skipcopy:
 
+    ld a, (menu_cnt)
+    or a
+    jr z, skipmenu
+
+    ld b, a
+    ld a, 7Fh   ; Prolog
+    ld hl, menu_addr
+
+nextmenu:
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    inc hl
+    ld (de), a
+    djnz nextmenu
+
+skipmenu:
     ld hl, (prg_start)
     push hl
 

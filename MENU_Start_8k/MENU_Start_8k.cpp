@@ -23,12 +23,20 @@ const std::string rom_prog_filename = "menu_start_8k.rom";
 //////////////////////////////////////////////////
 typedef struct
 {
+    std::string entry;          // Zeichenkette
+    uint16_t    address;        // Startadresse
+    uint16_t    prolog;         // Beginn vom Prolog
+} menu_entry_s;
+
+typedef struct
+{
     std::string                 name;
     uint8_t                     addrargs;
     uint16_t                    loadaddr;
     uint16_t                    endaddr;
     uint16_t                    startaddr;
     uint16_t                    prog_size;
+    std::vector<menu_entry_s>   menu_entry;
 } kcc_header_s;
 
 
@@ -170,6 +178,43 @@ bool isvalid( char value)
 }
 
 
+// sucht im Programmcode nach Menüeinträgen (+Startadresse)
+void find_start_addresses( kcc_header_s& header, const std::vector<uint8_t>& data)
+{
+    int index = 0;
+    uint16_t prolog_address = 0;
+
+    header.menu_entry.clear();
+    while( index + 4 < data.size()) // 4 = minimaler Prolog
+    {
+search:
+        // Prolog suchen
+        if(( data[ index] == 0x7f) && ( data[ index + 1] == 0x7f))
+        {
+            std::string name;
+            prolog_address = index;
+            index += 2;
+            while(( index + 1 < data.size()) && isvalid( data[ index]))
+            {
+                name += (char) data[ index];
+                index++;
+            }
+
+            // valides Epilogbyte?
+            if(( data[ index] <= 0x1f) &&( name.size() > 0))
+            {
+                uint16_t address = index + 1;
+                address += header.loadaddr;
+                //std::print( "{}: ", address);
+                //std::println( "{}", name);
+                header.menu_entry.push_back({ name, address, prolog_address});
+            }
+        }
+        index++;
+    }
+}
+
+
 // liest von 'richtiger' Speicheradresse
 uint8_t get_basic_byte( const std::vector<uint8_t>& kcc, const int real_addr)
 {
@@ -271,6 +316,8 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename, std::
         std::println( "FEHLER: Datei ({}) enthält keine Programmdaten!", filename_short);
         exit( EXIT_FAILURE);
     }
+    // Startadressen suchen
+    find_start_addresses( header, mem_data);
 
     std::println( "Header-Informationen");
     std::println( "Name:           {}", header.name);
@@ -313,6 +360,18 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename, std::
         exit( EXIT_FAILURE);
     }
 
+    // Menüeinträge ausgeben
+    if( header.menu_entry.size() > 0)
+    {
+        std::println( "Menüeinträge:");
+        int index = 1;
+        for( auto e: header.menu_entry)
+        {
+            std::println( "{:2}: {:10} -> {:04X}h", index, e.entry, e.address);
+            index++;
+        }
+    }
+
 
     // ROM-Datei einlesen
     std::ifstream rom_file(  rom_prog_filename, std::ios::binary | std::ios::in);
@@ -351,10 +410,19 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename, std::
     std::println();
     std::println( "Erzeuge ROM-Datei: {}", rom_filename);
 
+    // Menüworte präparieren
+    const int max_prepare_menu = 3;
+    int prepare_menu = ( header.menu_entry.size() > max_prepare_menu) ? max_prepare_menu : header.menu_entry.size();
+    while( prepare_menu > 0)
+    {
+        write_mem( mem_data, header.menu_entry[ prepare_menu - 1].prolog, (uint8_t) 0x7E);
+        prepare_menu--;
+    }
+
     uint16_t block1_start;
     uint16_t block1_length;
 
-    std::copy_n( rom_prog.begin(), rom_prog.size(), rom.begin() + ( 0xc000 - rom_offset));
+    std::copy_n( rom_prog.begin(), rom_prog.size(), rom.begin() + ( 0xC000 - rom_offset));
     int block1_max_size = rom.size()- rom_prog.size();
 
     // 1 Block
@@ -365,12 +433,23 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename, std::
     block1_start += rom_offset;
 
     // Update Kopierinformationen
-    // ab 0xf000h
+    // ab 0xF000h
     write_mem( rom, 0x0000, header.loadaddr);
     write_mem( rom, 0x0002, header.startaddr);
     write_mem( rom, 0x0004, header.addrargs);
     write_mem( rom, 0x0005, block1_start);
     write_mem( rom, 0x0007, block1_length);
+
+    // Update Menüwortinformationen
+    prepare_menu = ( header.menu_entry.size() > max_prepare_menu) ? max_prepare_menu : header.menu_entry.size();
+    write_mem( rom, 0x0009, (uint8_t) prepare_menu);
+    uint16_t prolog_addr = 0x000A;
+    while( prepare_menu > 0)
+    {
+        write_mem( rom, prolog_addr, (uint16_t)( header.menu_entry[ prepare_menu - 1].prolog + header.loadaddr));
+        prepare_menu--;
+        prolog_addr += 2;
+    }
 
     // Menüwort behandeln
     // zu lang
@@ -395,7 +474,7 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename, std::
     // Epilogbyte anhängen
     menuwort.push_back( (char)0x01);
     // in ROM einfügen
-    std::copy_n( menuwort.begin(), menuwort.size(), rom.begin() + 0x000B);
+    std::copy_n( menuwort.begin(), menuwort.size(), rom.begin() + 0x0012);
     // Epilogbyte entfernen
     menuwort.pop_back();
 
