@@ -47,6 +47,15 @@ für ROM/EPROM-Module mit 16 kByte-Segmenten, Start mittels Autostart
 nur im Modulschacht 8 mit Strukturbyte 01h
 
 
+## Beispiele
+
+### Start mit JUMP
+![JUMP Beispiel](JUMP_start.png)
+
+### Start mit Menüeintrag
+![MENU Beispiel](MENU_start.png)
+
+
 # Hilfsprogramme
 
 ## Binärdateien laden
