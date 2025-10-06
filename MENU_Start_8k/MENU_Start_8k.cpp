@@ -415,7 +415,7 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename, std::
     int prepare_menu = ( header.menu_entry.size() > max_prepare_menu) ? max_prepare_menu : header.menu_entry.size();
     while( prepare_menu > 0)
     {
-        write_mem( mem_data, header.menu_entry[ prepare_menu - 1].prolog, (uint8_t) 0x7E);
+        write_mem( mem_data, header.menu_entry[ prepare_menu - 1].prolog, (uint8_t) 0xFF);
         prepare_menu--;
     }
 

@@ -11,7 +11,7 @@ UP_LOOP EQU  0x12
     org 0c000h
 
     ; die folgenden Informationen
-    ; werden vom PC-Programm ergänzt
+    ; müssen vom PC-Programm ergänzt werden
 
     ; Programminfo
 prg_dest:

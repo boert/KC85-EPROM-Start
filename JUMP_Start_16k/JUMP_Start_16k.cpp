@@ -69,6 +69,7 @@ void help(  const std::string& self_name)
 void version( void)
 {
     std::println( "Version für 16k ROMs");
+    std::println( "Start mit JUMP");
     std::println( "compiled: " __DATE__ " " __TIME__);
 }
 
@@ -100,16 +101,8 @@ kcc_header_s read_header( const std::vector<uint8_t>& data)
         }
         else
         {
-            if( c > 0)
-            {
-                result.name += '.';
-            }
-            else
-            {
-                result.name += ' ';
-            }
+            result.name += ( c > 0) ? '.' : ' ';
         }
-
     }
 
     // Adressargumente
@@ -450,6 +443,7 @@ int main( int argc, char** argv)
         }
     }
 
+    // freie Argumente
     // erster Dateiname
     if( optind < argc)
     {

@@ -56,6 +56,7 @@ skip:
     ld (NCAOS+3), hl    ; weil hier die Zieladresse umgestellt wird, funktioniert JUMP nur einmal
     in a, (pio1_A)
     or 01h
+    ei
     jp NCAOS
     ; = out (pio1_A),A
     ; = JP hl

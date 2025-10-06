@@ -17,8 +17,9 @@
 //////////////////////////////////////////////////
 typedef struct
 {
-    std::string entry;
-    uint16_t    address;
+    std::string entry;          // Zeichenkette
+    uint16_t    address;        // Startadresse
+    uint16_t    mem_address;    // Beginn vom Prolog
 } menu_entry_s;
 
 typedef struct
@@ -60,6 +61,7 @@ kcc_header_s read_header( const std::vector<uint8_t>& data)
 {
     kcc_header_s result;
 
+    // Name + Erweiterung
     for( int index = 0; index < 11; index++)
     {
         char c = data[ index];
@@ -69,18 +71,11 @@ kcc_header_s read_header( const std::vector<uint8_t>& data)
         }
         else
         {
-            if( c > 0)
-            {
-                result.name += '.';
-            }
-            else
-            {
-                result.name += ' ';
-            }
+            result.name += ( c > 0) ? '.' : ' ';
         }
-
     }
 
+    // Adressargumente
     result.addrargs  = data[ 16];
     result.loadaddr  = data[ 17] + ( data[ 18] << 8);
     result.endaddr   = data[ 19] + ( data[ 20] << 8);
@@ -89,6 +84,18 @@ kcc_header_s read_header( const std::vector<uint8_t>& data)
     result.prog_size = result.endaddr - result.loadaddr;
 
     return result;
+}
+
+
+uint8_t lo( uint16_t data)
+{
+    return data & 0xff;
+}
+
+
+uint8_t hi( uint16_t data)
+{
+    return (data >> 8);
 }
 
 
@@ -163,7 +170,7 @@ uint16_t get_basic_word( const std::vector<uint8_t>& kcc, const int real_addr)
     if( loadaddr > real_addr) return 0xffff;
 
     int addr = real_addr - loadaddr + 0x80;
-    if( addr < 0x80)       return 0xffff;
+    if( addr < 0x80)        return 0xffff;
     if( addr >= kcc.size()) return 0xffff;
 
     uint16_t result = kcc[ addr] + ( kcc[ addr+1] << 8);

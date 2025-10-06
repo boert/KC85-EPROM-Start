@@ -12,7 +12,7 @@ PIOAD	EQU 88h
     org 0c000h
 
     ; die folgenden Informationen
-    ; werden vom PC-Programm ergänzt
+    ; müssen vom PC-Programm ergänzt werden
 
     ; Programminfo
 prg_dest:
@@ -29,29 +29,27 @@ bl1_size:
     dw 00000h   ; Länge, Block 1
 
     ; Menüpunkte restaurieren
+    ; Anzahl
 menu_cnt:
     db 0
+    ; bis zu drei Adressen
 menu_addr:
     dw 0
     dw 0
     dw 0
 
-    dw 07f7fh
-    db 'START'
+    dw 07F7Fh
+    db 'S'
     db 1
 
-    nop
-    nop
-    nop
-    nop
-    nop
+    ds 9, 0
 
 
     ; Block 1
     ld bc, (bl1_size)
     ld a, b
     or c
-    jr z, skip
+    jr z, skipcopy
 
     ; ROM E off
     di
@@ -68,14 +66,14 @@ menu_addr:
     set 0, a
     out (PIOAD), a
 
-skip:
+skipcopy:
 
     ld a, (menu_cnt)
     or a
     jr z, skipmenu
 
     ld b, a
-    ld a, 7fh
+    ld a, 7Fh   ; Prolog
     ld hl, menu_addr
 
 nextmenu:
