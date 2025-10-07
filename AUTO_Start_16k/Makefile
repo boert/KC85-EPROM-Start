@@ -10,7 +10,7 @@ exe: $(CPP_TARGET).exe
 
 # Linuxprogramm
 $(CPP_TARGET): $(CPP_TARGET).cpp     $(ASM_TARGET).rom
-	c++    $(OPTS)   $(CPP_TARGET).cpp -o $(CPP_TARGET)
+	c++    $(OPTS)   $(CPP_TARGET).cpp  -o $(CPP_TARGET)
 	strip  $(CPP_TARGET)
 
 debug: $(CPP_TARGET).cpp 

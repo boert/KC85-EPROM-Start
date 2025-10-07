@@ -18,8 +18,14 @@
 #include <string>
 #include <unistd.h>     // getopt
 
+
 //////////////////////////////////////////////////
-const std::string rom_prog_filename = "auto_start_8k.rom";
+// ROM-Datei einbinden
+const std::vector<uint8_t> rom_prog
+{
+#embed "auto_start_8k.rom"
+};
+
 
 //////////////////////////////////////////////////
 typedef struct
@@ -378,16 +384,6 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename, std::
             std::println( "{:2}: {:10} -> {:04X}h", index, e.entry, e.address);
             index++;
         }
-    }
-
-
-    // ROM-Datei einlesen
-    std::ifstream rom_file(  rom_prog_filename, std::ios::binary | std::ios::in);
-    std::vector< uint8_t> rom_prog( std::istreambuf_iterator<char>( rom_file), {});
-    if( rom_prog.size() <= 10)
-    {
-        std::println( "FEHLER: Hilfsprogramm ({}) nicht vorhanden!", rom_prog_filename);
-        exit( EXIT_FAILURE);
     }
 
     // wird haben Platz:
