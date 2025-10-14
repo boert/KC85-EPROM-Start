@@ -19,6 +19,8 @@
 #include <unistd.h>     // getopt
 
 
+#include "rom.h"        // Symbole aus ROM-Datei
+
 //////////////////////////////////////////////////
 // ROM-Datei einbinden
 const std::vector<uint8_t> rom_prog
@@ -61,7 +63,7 @@ void help(  const std::string& self_name)
     std::println();
     std::println();
     std::println( "Geeignet für die Kleincomputer KC85/3, KC85/4 und KC85/5.");
-    std::println( "Benötigt wird ein ROM- bzw. EPROM-Modul mit 8 kByte Segmenten.");
+    std::println( "Benötigt wird ein ROM- bzw. EPROM-Modul mit 16 kByte Segmenten.");
     std::println();
     std::println( "Folgende Module sind geeignet:");
     std::println( "    M028  16 K EPROM (modifiziert)");
@@ -390,8 +392,8 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename, std::
     if( mem_data.size() > max_prog_size)
     {
         std::println( "FEHLER: KCC-Datei ({}) leider zu groß!", filename_short);
-        std::println( "Speichergöße: {}  Bytes", max_prog_size);
-        std::println( "Programmgöße: {}  Bytes", header.prog_size);
+        std::println( "verfügbarer Speicher: {}  Bytes", max_prog_size);
+        std::println( "benötigter Speicher: {}  Bytes", header.prog_size);
         exit( EXIT_FAILURE);
     }
 
@@ -402,6 +404,7 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename, std::
     std::println();
     std::println( "ROM-Informationen");
     std::println( "ROM-Größe: {} Bytes", rom.size());
+    std::println( "Hilfsprog: {} Bytes", rom_prog.size());
     std::println( "verfügbar: {} Bytes", max_prog_size);
 
     std::println();
@@ -419,8 +422,9 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename, std::
     uint16_t block1_start;
     uint16_t block1_length;
 
+    // ASM-Programm in ROM kopieren
     std::copy_n( rom_prog.begin(), rom_prog.size(), rom.begin() + ( 0xC000 - rom_offset));
-    int block1_max_size = rom.size()- rom_prog.size();
+    int block1_max_size = rom.size() - rom_prog.size();
 
     // 1 Block
     block1_start = rom_prog.size();
@@ -432,15 +436,15 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename, std::
     // Update Kopierinformationen
     // ab 0xC000h
     // Adresse müssen zum asm-Programm passen
-    write_mem( rom, 0x002f, header.loadaddr);
-    write_mem( rom, 0x0031, header.startaddr);
-    write_mem( rom, 0x0033, block1_start);
-    write_mem( rom, 0x0035, block1_length);
+    write_mem( rom, prg_dest    - rom_offset, header.loadaddr);
+    write_mem( rom, prg_start   - rom_offset, header.startaddr);
+    write_mem( rom, bl1_start   - rom_offset, block1_start);
+    write_mem( rom, bl1_size    - rom_offset, block1_length);
 
     // Update Menüwortinformationen
     prepare_menu = ( header.menu_entry.size() > max_prepare_menu) ? max_prepare_menu : header.menu_entry.size();
-    write_mem( rom, 0x0037, (uint8_t) prepare_menu);
-    uint16_t prolog_addr = 0x0038;
+    write_mem( rom, menu_cnt - rom_offset, (uint8_t) prepare_menu);
+    uint16_t prolog_addr = menu_addr - rom_offset;
     while( prepare_menu > 0)
     {
         write_mem( rom, prolog_addr, (uint16_t)( header.menu_entry[ prepare_menu - 1].prolog + header.loadaddr));
@@ -471,7 +475,7 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename, std::
     // Epilogbyte anhängen
     menuwort.push_back( (char)0x01);
     // in ROM einfügen
-    std::copy_n( menuwort.begin(), menuwort.size(), rom.begin() + 0x0040);
+    std::copy_n( menuwort.begin(), menuwort.size(), rom.begin() + mwort - rom_offset);
     // Epilogbyte entfernen
     menuwort.pop_back();
 

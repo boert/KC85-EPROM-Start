@@ -10,7 +10,7 @@ NCAOS:  equ 0b7b4h
     org 0f000h
 
     ; die folgenden Informationen
-    ; werden von JUMP_KCC ergänzt
+    ; müssen vom PC-Programm ergänzt werden
 
     ; Programminfo
 prg_dest:

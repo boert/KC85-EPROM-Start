@@ -18,6 +18,8 @@
 #include <unistd.h>     // getopt
 
 
+#include "rom.h"        // Symbole aus ROM-Datei
+
 //////////////////////////////////////////////////
 // ROM-Datei einbinden
 const std::vector<uint8_t> rom_prog
@@ -62,7 +64,7 @@ void help(  const std::string& self_name)
     std::println( "    M125  USER PROM 8K/16K/64K");
     std::println();
     std::println( "Achtung! Limitierung der Programmgröße auf 8 kByte,");
-    std::println( "abzüglich des Hilfsprogrammes (<80 Bytes).");
+    std::println( "abzüglich des Hilfsprogrammes (ca. 80 Bytes).");
     std::println( "Die erzeugte ROM-Datei muß im letzten Segement gespeichert werden.");
     std::println();
     std::println( "Programmaufruf:");
@@ -288,13 +290,13 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename)
     }
     std::println( "Anfangsadr.:    {:04X}h", header.loadaddr);
     std::println( "Endeadr(+1):    {:04X}h", header.endaddr);
-    if( header.addrargs >= 3)
+    if( header.addrargs > 2)
     {
         std::println( "Startadr.:      {:04X}h", header.startaddr);
     }
     else
     {
-        std::println( "FEHLER: Keine Startadresse hinterlegt, bitte KCC-Datei korrigieren!");
+        std::println( "FEHLER: Keine Startadresse hinterlegt, bitte KCC-Datei korrigieren.");
         exit( EXIT_FAILURE);
     }
     std::println( "Programmgröße:  {} Bytes", header.prog_size);
@@ -327,13 +329,11 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename)
     int max_prog_size = 8192 - rom_prog.size();
 
     // Größe prüfen
-    //std::println( "header.progsize: {}", header.prog_size);
-    //std::println( "mem_data.size(): {}", mem_data.size());
     if( mem_data.size() > max_prog_size)
     {
         std::println( "FEHLER: KCC-Datei ({}) leider zu groß!", filename_short);
-        std::println( "Speichergöße: {}  Bytes", max_prog_size);
-        std::println( "Programmgöße: {}  Bytes", header.prog_size);
+        std::println( "verfügbarer Speicher: {}  Bytes", max_prog_size);
+        std::println( "benötigter Speicher: {}  Bytes", header.prog_size);
         exit( EXIT_FAILURE);
     }
 
@@ -344,6 +344,7 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename)
     std::println();
     std::println( "ROM-Informationen");
     std::println( "ROM-Größe: {} Bytes", rom.size());
+    std::println( "Hilfsprog: {} Bytes", rom_prog.size());
     std::println( "verfügbar: {} Bytes", max_prog_size);
 
     std::println();
@@ -354,6 +355,7 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename)
     uint16_t block2_start;
     uint16_t block2_length;
 
+    // ASM-Programm in ROM kopieren
     std::copy_n( rom_prog.begin(), rom_prog.size(), rom.begin() + ( 0xf000 - rom_offset));
     int block1_max_size = 4096 - rom_prog.size();
 
@@ -383,13 +385,14 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename)
     block2_start += rom_offset;
 
     // Update Kopierinformationen
-    // ab 0xf000h
-    write_mem( rom, 0x1000, header.loadaddr);
-    write_mem( rom, 0x1002, header.startaddr);
-    write_mem( rom, 0x1004, block1_start);
-    write_mem( rom, 0x1006, block1_length);
-    write_mem( rom, 0x1008, block2_start);
-    write_mem( rom, 0x100a, block2_length);
+    // ab 0xF000h
+    // Adresse müssen zum asm-Programm passen
+    write_mem( rom, prg_dest    - rom_offset, header.loadaddr);
+    write_mem( rom, prg_start   - rom_offset, header.startaddr);
+    write_mem( rom, bl1_start   - rom_offset, block1_start);
+    write_mem( rom, bl1_size    - rom_offset, block1_length);
+    write_mem( rom, bl2_start   - rom_offset, block2_start);
+    write_mem( rom, bl2_size    - rom_offset, block2_length);
 
     // Statusinformationen
     std::println( "Block 1: {:04X}h...{:04X}h", block1_start, block1_start + block1_length - 1);

@@ -38,12 +38,15 @@ menu_addr:
     dw 0
     dw 0
 
+    ; hier startet der Menüeintrag
     dw 07F7Fh
+mwort:
     db 'S'
     db 1
 
     ds 9, 0
 
+    ; und hier das eigentliche Programm
 
     ; Block 1
     ld bc, (bl1_size)

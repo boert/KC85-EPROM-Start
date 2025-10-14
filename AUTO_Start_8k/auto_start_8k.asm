@@ -92,12 +92,15 @@ menu_addr:
     dw 0
     dw 0
 
+    ; hier startet der Menüeintrag
     dw 07F7Fh
+mwort:
     db 'S'
     db 1
 
     ds 9, 0
 
+    ; und hier das eigentliche Programm
 CSTART:
 
     LD  A, (0E011h) ; CAOS ab 4.1 hat dort 07f7fh stehen
@@ -136,7 +139,7 @@ MODNEXT:
     RET
 
 MODFOUND:
-    LD  A, B        ; Modulschacht 
+    LD  A, B    ; Modulschacht 
     SCF         ; Carry auf 1
     CCF         ; Carry invert
     RET
@@ -181,11 +184,12 @@ nextmenu:
 
 skipmenu:
 
-    ld hl, (prg_start)
+    ; Stack vorbereiten
     ld de, JUMPCAOS
     push de
 
     ; Programm starten
+    ld hl, (prg_start)
     jp (hl)
 
     ; zurück zum CAOS
