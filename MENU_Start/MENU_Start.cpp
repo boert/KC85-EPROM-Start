@@ -3,7 +3,9 @@
 // Dieses Programm generiert EPROM-Inhalte, die
 // mit MENU gestartet werden können
 //
-// 16k-Version für z.B. M028 16 K PROM
+// Version für 8k und 16k-ROMs
+// - z.B. M025 USER PROM 8K
+// - z.B. M028 16 K PROM
 //
 // (c) 2025, Bert Lange
 //////////////////////////////////////////////////
@@ -16,6 +18,7 @@
 #include <cctype>       // isprint
 #include <string>
 #include <unistd.h>     // getopt
+#include <string.h>     // strcmp
 
 
 #include "rom.h"        // Symbole aus ROM-Datei
@@ -24,7 +27,7 @@
 // ROM-Datei einbinden
 const std::vector<uint8_t> rom_prog
 {
-#embed "menu_start_16k.rom"
+#embed "menu_start.rom"
 };
 
 
@@ -62,20 +65,30 @@ void help(  const std::string& self_name)
     std::println();
     std::println();
     std::println( "Geeignet für die Kleincomputer KC85/3, KC85/4 und KC85/5.");
-    std::println( "Benötigt wird ein ROM- bzw. EPROM-Modul mit 8 kByte Segmenten.");
+    std::println( "Benötigt wird ein ROM- bzw. EPROM-Modul mit 8 oder 16 kByte Segmenten.");
     std::println();
-    std::println( "Folgende Module sind geeignet:");
+    std::println( "Folgende Module sind geeignet (Segmentgröße 8 kByte):");
+    std::println( "    M025  USER PROM 8K");
+    std::println( "    M045  32k segmented ROM");
+    std::println( "    M046  64k segmented ROM");
+    std::println( "    M047  128k segmented ROM");
+    std::println( "    M062  32k/64k seg. RAM/ROM");
+    std::println( "    M125  USER PROM 8K/16K/64K");
+    std::println();
+    std::println( "Folgende Module sind geeignet (Segmentgröße 16 kByte):");
     std::println( "    M028  16 K EPROM");
     std::println( "    M040  USER PROM 16k");
     std::println( "    M048  256k segmented ROM");
     std::println();
-    std::println( "Achtung! Limitierung der Programmgröße auf 16 kByte,");
+    std::println( "Achtung! Limitierung der Programmgröße auf 8 bzw. 16 kByte,");
     std::println( "abzüglich des Hilfsprogrammes (ca. 100 Bytes).");
+    std::println( "Bei Modulen mit mehreren Segmenten kann in jedem Segment ein eigenes Programm abgelegt werden.");
     std::println();
     std::println( "Programmaufruf:");
-    std::println( "{} [-o|-v] [-m START] <KCC-Datei> <ROM-Datei>", self_name);
+    std::println( "{} [-o|-v] [-m START] -s <Segmentgröße> <KCC-Datei> <ROM-Datei>", self_name);
     std::println();
     std::println( "Programmptionen:");
+    std::println( "-s n Segmentgröße n kByte, (n = 8 oder 16)");
     std::println( "-o   evtl. vorhandene ROM-Datei überschreiben");
     std::println( "-m   Menüwort (Standard: START)");
     std::println( "-v   Programmversion ausgeben");
@@ -85,7 +98,7 @@ void help(  const std::string& self_name)
 // Version ausgeben
 void version( void)
 {
-    std::println( "Version für 16k ROMs");
+    std::println( "Version für 8k und 16k ROMs");
     std::println( "Start mit Menüwort");
     std::println( "compiled: " __DATE__ " " __TIME__);
 }
@@ -287,7 +300,7 @@ void hex_dump( const std::vector< uint8_t>& data, const int start, const int len
 
 
 // Datei einlesen und auswerten
-void convert_KCC_file( std::string kcc_filename, std::string rom_filename, std::string menuwort)
+void convert_KCC_file( std::string kcc_filename, std::string rom_filename, std::string menuwort, int size)
 {
     const std::string filename_short = std::filesystem::path( kcc_filename).filename().string();
 
@@ -379,9 +392,13 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename, std::
 
 
     // wird haben Platz:
+    // 16k
     // Block 1: C0xx-FFFF   ~16300 Bytes
+    //
+    // 8k
+    // Block 1: C0xx-DFFF   ~8100 Bytes
 
-    int max_prog_size = 16384 - rom_prog.size();
+    int max_prog_size = size * 1024 - rom_prog.size();
 
     // Größe prüfen
     if( mem_data.size() > max_prog_size)
@@ -393,7 +410,7 @@ void convert_KCC_file( std::string kcc_filename, std::string rom_filename, std::
     }
 
     // ROM anlegen
-    std::vector<uint8_t> rom( 16384, 0xff);
+    std::vector<uint8_t> rom( size * 1024, 0xff);
     const uint16_t rom_offset = 0xc000;
 
     std::println();
@@ -492,6 +509,7 @@ int main( int argc, char** argv)
 
     const std::string self_name = argv[ 0];
     bool overwrite = false;
+    int romsize = 0;
     int c;
     std::string kcc_filename;
     std::string rom_filename;
@@ -507,7 +525,7 @@ int main( int argc, char** argv)
 #endif
 
     // Argumente auswerten
-    while(( c = getopt( argc, argv, "hvom:")) != -1)
+    while(( c = getopt( argc, argv, "hvom:s:")) != -1)
     {
         switch( c)
         {
@@ -529,6 +547,18 @@ int main( int argc, char** argv)
             case 'm':
                 //std::println( "optarg: {}", optarg);
                 menuwort = optarg;
+                break;
+
+            case 's':
+                //std::println( "optarg: {}", optarg);
+                if( strcmp( "8", optarg) == 0)
+                {
+                    romsize = 8;
+                }
+                if( strcmp( "16", optarg) == 0)
+                {
+                    romsize = 16;
+                }
                 break;
         }
     }
@@ -584,15 +614,25 @@ int main( int argc, char** argv)
         exit( EXIT_FAILURE);
     }
 
+    // Segmentgröße ausgewählt?
+    if( romsize == 0)
+    {
+        std::println( "FEHLER: Keine gültige Segmentgröße angegeben.");
+        std::println( "Option '-s  8' für  8 kByte Segmentgröße");
+        std::println( "Option '-s 16' für 16 kByte Segmentgröße");
+        exit( EXIT_FAILURE);
+    }
+
 #if 0
     std::println( "Argumente ausgewertet: ");
     std::println( "KCC-Datei: {}", kcc_filename);
     std::println( "ROM-Datei: {}", rom_filename);
     std::println( "Menüwort: {}", menuwort);
     std::println( "Überschreiben: {}", overwrite);
+    std::println( "EPROM: {}k", romsize);
     std::println();
     exit( EXIT_SUCCESS);
 #endif
 
-    convert_KCC_file( kcc_filename, rom_filename, menuwort);
+    convert_KCC_file( kcc_filename, rom_filename, menuwort, romsize);
 }

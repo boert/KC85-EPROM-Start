@@ -1,5 +1,5 @@
-ASM_TARGET= auto_start_16k
-CPP_TARGET= AUTO_Start_16k
+ASM_TARGET= auto_start
+CPP_TARGET= AUTO_Start
 
 OPTS=  -std=gnu++23 -static
 WINOPTS=  -lstdc++exp  -static-libgcc 

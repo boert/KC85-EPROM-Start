@@ -1,6 +1,8 @@
 ; Hilfsprogramm
 ; zum Starten eine Programms aus dem ROM
-; 16k-Version für z.B. M028 16 K PROM
+; Version für 8k und 16k-ROMs
+; - z.B. M025 USER PROM 8K
+; - z.B. M028 16 K EPROM
 ; Start des Programms mittels MENU
 ;
 ; (c) 2025, Bert Lange

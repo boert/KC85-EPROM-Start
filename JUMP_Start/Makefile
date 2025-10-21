@@ -1,5 +1,5 @@
-ASM_TARGET= jump_start_16k
-CPP_TARGET= JUMP_Start_16k
+ASM_TARGET= jump_start
+CPP_TARGET= JUMP_Start
 
 OPTS=  -std=gnu++23 -static
 WINOPTS=  -lstdc++exp  -static-libgcc 

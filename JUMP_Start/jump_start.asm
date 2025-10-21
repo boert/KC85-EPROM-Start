@@ -1,6 +1,10 @@
 ; Hilfsprogramm
 ; zum Starten eine Programms aus dem ROM
-; 16k-Version für z.B. M028 16 K EPROM
+; Version für 8k und 16k-ROMs
+; - z.B. M025 USER PROM 8K
+; - z.B. M028 16 K EPROM
+; Start des Programms mittels 
+; JUMP <Schachtnummer>
 ;
 ; (c) 2025, Bert Lange
 
@@ -10,7 +14,7 @@ NCAOS:  equ 0b7b4h
     org 0f000h
 
     ; die folgenden Informationen
-    ; werden von JUMP_KCC ergänzt
+    ; müssen vom PC-Programm ergänzt werden
 
     ; Programminfo
 prg_dest:
@@ -26,7 +30,7 @@ bl1_size:
 
     ; Block 2
 bl2_start:
-    dw 0c000h   ; Quelle, Block 2
+    dw 0e000h   ; Quelle, Block 2
 bl2_size:
     dw 00000h   ; Länge, Block 2
 

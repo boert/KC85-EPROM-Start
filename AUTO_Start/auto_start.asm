@@ -1,6 +1,8 @@
 ; Hilfsprogramm
 ; zum Starten eine Programms aus dem ROM
-; 8k-Version für z.B. M028 16 K PROM (modifiziertes Strukturbyte)
+; Version für 8k und 16k-ROMs geeignet
+; - z.B. M025 USER PROM 8K (modifiziertes Strukturbyte)
+; - z.B. M028 16 K PROM (modifiziertes Strukturbyte)
 ; Start des Programms mittels 
 ; AUTOSTART (im Schacht 08) oder per MENU
 ;

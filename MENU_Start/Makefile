@@ -1,5 +1,5 @@
-ASM_TARGET= menu_start_16k
-CPP_TARGET= MENU_Start_16k
+ASM_TARGET= menu_start
+CPP_TARGET= MENU_Start
 
 OPTS=  -std=gnu++23 -static
 WINOPTS=  -lstdc++exp  -static-libgcc 

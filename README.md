@@ -21,30 +21,17 @@ Es werden unterschiedliche Modultypen und verschiedene Startmethoden unterstütz
 | M062  64k seg. RAM         | F3/01             |  8 kByte          | 8        | ja      | nein     | ja      | nein     | ja [^4] | nein
 | M125  USER PROM 8K/16K/64K | unbek.            |  8 kByte          | 1-4      | ja      | nein     | ja      | nein     | ja [^3] | nein
 
-## Für Module mit 8kByte-Segmenten
+## Startvarianten
 
-### `JUMP_Start_8k`
-für ROM/EPROM-Module mit 8 kByte-Segmenten, Start mittels JUMP
+### `JUMP_Start`
+Start mittels JUMP
 
-### `MENU_Start_8k`
-für ROM/EPROM-Module mit 8 kByte-Segmenten, Start mittels MENU
+### `MENU_Start`
+Start mittels MENU (bzw. Menüeintrag)
 
-### `AUTO_Start_8k`
-für ROM/EPROM-Module mit 8 kByte-Segmenten, Start mittels Autostart
-nur im Modulschacht 8 mit Strukturbyte 01h
-
-
-## Für Module mit 16kByte-Segmenten
-
-### `JUMP_Start_16k`
-für ROM/EPROM-Module mit 16 kByte-Segmenten, Start mittels JUMP
-
-### `MENU_Start_16k`
-für ROM/EPROM-Module mit 16 kByte-Segmenten, Start mittels MENU
-
-### `AUTO_Start_16k`
-für ROM/EPROM-Module mit 16 kByte-Segmenten, Start mittels Autostart
-nur im Modulschacht 8 mit Strukturbyte 01h
+### `AUTO_Start`
+Start mittels Autostart  
+(nur im Modulschacht 8 mit Strukturbyte 01h)  
 
 
 ## Beispiele
