@@ -33,6 +33,13 @@ Start mittels MENU (bzw. Menüeintrag)
 Start mittels Autostart  
 (nur im Modulschacht 8 mit Strukturbyte 01h)  
 
+### `MULTI_Start`
+Freie Wahl! Es werden alle bekannten Startmethoden unterstützt.
+
+- Start mittels JUMP
+- Start mittels MENU (bzw. Menüeintrag)
+- Start mittels Autostart (Struktrubyte 01h, Schacht 08)
+
 
 ## Beispiele
 
@@ -50,6 +57,11 @@ siehe [BINLOAD](BINLOAD).
 
 ## KCC-Dateien überprüfen
 siehe [check_KCC](check_KCC).
+
+## Modulschächte
+Im Bild ist für einen KC85 mit D002-Erweiterung die Zählung der Modulschächte dargestellt:
+![Zählung der Modulschächte](Modulschaechte.png)
+
 
 [^1]: CAOS Maschinenprogramm  
 [^2]: BASIC-Programm, abgespeichert als Maschinenprogramm  
