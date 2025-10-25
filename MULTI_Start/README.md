@@ -3,7 +3,7 @@
 Mit diesem Programm läßt sich eine KCC (bzw. KCB)-Datei in ein startfähiges ROM umwandeln.
 Geeignet für die Kleincomputer KC85/3, KC85/4 und KC85/5.
 
-Der Start im KC85 erfolgt automatisch, wenn das Modul im Schacht 8 geteckt wird und das Strukturbyte 01h besizt.
+Der Start im KC85 erfolgt automatisch, wenn das Modul im Schacht 8 gesteckt wird und das Strukturbyte 01h besizt.
 
 Falls ein anderer Schacht genutzt wird oder das Modul nicht das Strukturbyte 01h hat, kann das Programm auch wie folgt gestartet werden:
 
