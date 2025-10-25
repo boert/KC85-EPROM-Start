@@ -40,6 +40,11 @@ Freie Wahl! Es werden alle bekannten Startmethoden unterstützt.
 - Start mittels MENU (bzw. Menüeintrag)
 - Start mittels Autostart (Struktrubyte 01h, Schacht 08)
 
+### `MULTI_Start_compressed`
+Freie Wahl der Startmethode, wie bei `MULTI_Start`. Zusätzlich mit Kompression (ZX0)!  
+Im Schnitt lassen sich die KC85-Programme auf 30 bis 60% ihrer ursprünglichen Größe reduzieren.  
+Damit kann ggf. ein kleineres ERPOM verwendet werden.  
+Das Entpacken im KC85 dauert selten länger als 0,5 Sekunden.
 
 ## Beispiele
 

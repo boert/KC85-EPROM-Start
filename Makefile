@@ -2,22 +2,24 @@ RELEASE_NUMBER=2025_10
 
 release: release_win release_linux
 
-release_linux: check_KCC/check_KCC  AUTO_Start/AUTO_Start  JUMP_Start/JUMP_Start  MENU_Start/MENU_Start  MULTI_Start/MULTI_Start
+release_linux: check_KCC/check_KCC  AUTO_Start/AUTO_Start  JUMP_Start/JUMP_Start  MENU_Start/MENU_Start  MULTI_Start/MULTI_Start  MULTI_Start_compressed/MULTI_Start_zx0
 	mkdir -p release_linux
-	cp check_KCC/check_KCC           release_linux
-	cp AUTO_Start/AUTO_Start         release_linux
-	cp JUMP_Start/JUMP_Start         release_linux
-	cp MENU_Start/MENU_Start         release_linux
-	cp MULTI_Start/MULTI_Start       release_linux
+	cp check_KCC/check_KCC                      release_linux
+	cp AUTO_Start/AUTO_Start                    release_linux
+	cp JUMP_Start/JUMP_Start                    release_linux
+	cp MENU_Start/MENU_Start                    release_linux
+	cp MULTI_Start/MULTI_Start                  release_linux
+	cp MULTI_Start_compressed/MULTI_Start_zx0   release_linux
 	cd release_linux; zip -9   ../release_linux__$(RELEASE_NUMBER) *
 
-release_win: check_KCC/check_KCC.exe  AUTO_Start/AUTO_Start.exe  JUMP_Start/JUMP_Start.exe  MENU_Start/MENU_Start.exe  MULTI_Start/MULTI_Start.exe
+release_win: check_KCC/check_KCC.exe  AUTO_Start/AUTO_Start.exe  JUMP_Start/JUMP_Start.exe  MENU_Start/MENU_Start.exe  MULTI_Start/MULTI_Start.exe  MULTI_Start_compressed/MULTI_Start_zx0.exe
 	mkdir -p release_win
-	cp check_KCC/check_KCC.exe           release_win
-	cp AUTO_Start/AUTO_Start.exe         release_win
-	cp JUMP_Start/JUMP_Start.exe         release_win
-	cp MENU_Start/MENU_Start.exe         release_win
-	cp MULTI_Start/MULTI_Start.exe       release_win
+	cp check_KCC/check_KCC.exe                      release_win
+	cp AUTO_Start/AUTO_Start.exe                    release_win
+	cp JUMP_Start/JUMP_Start.exe                    release_win
+	cp MENU_Start/MENU_Start.exe                    release_win
+	cp MULTI_Start/MULTI_Start.exe                  release_win
+	cp MULTI_Start_compressed/MULTI_Start_zx0.exe   release_win
 	cd release_win; zip -9   ../release_win__$(RELEASE_NUMBER) *
 
 
@@ -36,6 +38,9 @@ MENU_Start/MENU_Start:
 MULTI_Start/MULTI_Start:
 	$(MAKE) -C MULTI_Start all
 
+MULTI_Start_compressed/MULTI_Start_zx0:
+	$(MAKE) -C MULTI_Start_compressed all
+
 
 check_KCC/check_KCC.exe:
 	$(MAKE) -C check_KCC check_KCC.exe
@@ -52,6 +57,9 @@ MENU_Start/MENU_Start.exe:
 MULTI_Start/MULTI_Start.exe:
 	$(MAKE) -C MULTI_Start exe
 
+MULTI_Start_compressed/MULTI_Start_zx0.exe:
+	$(MAKE) -C MULTI_Start_compressed exe
+
 
 .phony: release_win release_linux
 
@@ -63,3 +71,4 @@ clean:
 	$(MAKE) clean -C JUMP_Start
 	$(MAKE) clean -C MENU_Start
 	$(MAKE) clean -C MULTI_Start
+	$(MAKE) clean -C MULTI_Start_compressed
